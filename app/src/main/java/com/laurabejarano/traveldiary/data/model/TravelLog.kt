@@ -5,11 +5,9 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "travel_logs")
 data class TravelLog(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
-
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val title: String,
-    val imageUri: String?, // stored as a URI string (from gallery)
+    val imageUri: String?, // stored as a URI string
     val location: String,
     val startDate: String,
     val endDate: String,

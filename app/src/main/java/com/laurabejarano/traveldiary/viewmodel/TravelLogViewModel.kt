@@ -3,21 +3,21 @@ package com.laurabejarano.traveldiary.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.laurabejarano.traveldiary.data.database.TravelLogDatabase
+import com.laurabejarano.traveldiary.data.database.TravelLogDB
 import com.laurabejarano.traveldiary.data.model.TravelLog
-import com.laurabejarano.traveldiary.data.repo.TravelLogRepository
+import com.laurabejarano.traveldiary.data.repo.TravelLogRepo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class TravelLogViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val repository: TravelLogRepository
+    private val repository: TravelLogRepo
     val travelLogs: StateFlow<List<TravelLog>>
 
     init {
-        val dao = TravelLogDatabase.getDatabase(application).travelLogDao()
-        repository = TravelLogRepository(dao)
+        val dao = TravelLogDB.getDatabase(application).travelLogDao()
+        repository = TravelLogRepo(dao)
         travelLogs = repository.getAllLogs()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
     }

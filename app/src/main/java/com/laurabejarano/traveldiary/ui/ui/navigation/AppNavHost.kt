@@ -40,8 +40,8 @@ fun AppNavHost(
         }
 
         // Search Screen
-        composable(NavRoutes.Search.route) {
-            SearchScreen(navController = navController, viewModel = viewModel)
-        }
+//        composable(NavRoutes.Search.route) {
+//            SearchScreen(navController = navController, viewModel = viewModel)
+//        }
     }
 }
