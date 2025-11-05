@@ -59,6 +59,7 @@ dependencies {
     // --- Room (KSP) ---
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.compose.foundation.layout)
     ksp(libs.androidx.room.compiler)
 
     // --- Coroutines ---
