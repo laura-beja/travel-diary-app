@@ -1,13 +1,12 @@
+// CreateLogScreen.kt
 package com.laurabejarano.traveldiary.ui.ui.screens
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -16,7 +15,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -29,9 +27,18 @@ import com.laurabejarano.traveldiary.viewmodel.TravelLogViewModel
 @Composable
 fun CreateLogScreen(
     navController: NavController,
-    viewModel: TravelLogViewModel = viewModel()
+    viewModel: TravelLogViewModel = viewModel(),
+    editingId: Int? // ✅ NEW: null = create, non-null = edit
 ) {
-    // Input fields (rememberSaveable so they persist on rotation)
+    val context = LocalContext.current
+
+    // Prefill when editing
+    LaunchedEffect(editingId) {
+        if (editingId != null) viewModel.loadLogById(editingId)
+    }
+    val editingLog by viewModel.currentLog.collectAsState()
+
+    // Inputs
     var title by rememberSaveable { mutableStateOf("") }
     var location by rememberSaveable { mutableStateOf("") }
     var startDate by rememberSaveable { mutableStateOf("") }
@@ -40,18 +47,30 @@ fun CreateLogScreen(
     var description by rememberSaveable { mutableStateOf("") }
     var imageUri by rememberSaveable { mutableStateOf<Uri?>(null) }
 
-    val context = LocalContext.current
+    // When editingLog arrives, prefill once
+    LaunchedEffect(editingLog) {
+        editingLog?.let { log ->
+            title = log.title
+            location = log.location
+            startDate = log.startDate
+            endDate = log.endDate
+            participants = log.participants ?: ""
+            description = log.description ?: ""
+            imageUri = log.imageUri?.let { Uri.parse(it) }
+        }
+    }
 
-    // Launcher to pick an image from gallery
     val pickImageLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri -> imageUri = uri }
     )
 
+    val isEditing = editingId != null
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("New Travel Log") },
+                title = { Text(if (isEditing) "Edit Travel Log" else "New Travel Log") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -59,9 +78,9 @@ fun CreateLogScreen(
                 },
                 actions = {
                     IconButton(onClick = {
-                        // Create a new TravelLog entity
                         if (title.isNotBlank()) {
                             val log = TravelLog(
+                                id = editingId ?: 0, // Room will ignore id=0 on insert
                                 title = title,
                                 imageUri = imageUri?.toString(),
                                 location = location,
@@ -70,8 +89,12 @@ fun CreateLogScreen(
                                 participants = participants,
                                 description = description
                             )
-                            viewModel.addLog(log)
-                            navController.popBackStack() // Go back to Home
+                            if (isEditing) {
+                                viewModel.updateLog(log)
+                            } else {
+                                viewModel.addLog(log)
+                            }
+                            navController.popBackStack()
                         }
                     }) {
                         Icon(Icons.Default.Save, contentDescription = "Save")
@@ -93,14 +116,12 @@ fun CreateLogScreen(
                 label = { Text("Trip Title") },
                 modifier = Modifier.fillMaxWidth()
             )
-
             OutlinedTextField(
                 value = location,
                 onValueChange = { location = it },
                 label = { Text("Location") },
                 modifier = Modifier.fillMaxWidth()
             )
-
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
                     value = startDate,
@@ -115,14 +136,12 @@ fun CreateLogScreen(
                     modifier = Modifier.weight(1f)
                 )
             }
-
             OutlinedTextField(
                 value = participants,
                 onValueChange = { participants = it },
                 label = { Text("Participants (comma-separated)") },
                 modifier = Modifier.fillMaxWidth()
             )
-
             OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },
@@ -131,7 +150,6 @@ fun CreateLogScreen(
                 maxLines = 3
             )
 
-            // Image Picker Section
             Box(
                 modifier = Modifier
                     .fillMaxWidth()

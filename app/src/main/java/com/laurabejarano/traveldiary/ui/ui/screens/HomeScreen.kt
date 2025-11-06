@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.laurabejarano.traveldiary.data.model.TravelLog
+import com.laurabejarano.traveldiary.ui.ui.components.BottomNav
 import com.laurabejarano.traveldiary.ui.ui.navigation.NavRoutes
 import com.laurabejarano.traveldiary.viewmodel.TravelLogViewModel
 
@@ -28,6 +29,9 @@ fun HomeScreen(
             CenterAlignedTopAppBar(
                 title = { Text("Travel Diary") }
             )
+        },
+        bottomBar = {
+            BottomNav(navController = navController)
         },
         floatingActionButton = {
             FloatingActionButton(onClick = {
@@ -46,7 +50,7 @@ fun HomeScreen(
                 val log = logs[index]
                 TravelLogItem(log) {
                     // When a user taps a log, navigate to details screen
-                    navController.navigate(NavRoutes.Details.route)
+                    navController.navigate("${NavRoutes.Details.route}/${log.id}")
                 }
             }
         }

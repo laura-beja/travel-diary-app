@@ -10,4 +10,5 @@ class TravelLogRepo(private val dao: TravelLogDao) {
     suspend fun insert(log: TravelLog) = dao.insertLog(log)
     suspend fun update(log: TravelLog) = dao.updateLog(log)
     suspend fun delete(log: TravelLog) = dao.deleteLog(log)
+    suspend fun getById(id: Int): TravelLog? = dao.getLogById(id)
 }

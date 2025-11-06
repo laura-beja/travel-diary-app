@@ -12,7 +12,7 @@ import com.laurabejarano.traveldiary.ui.ui.screens.SearchScreen
 import com.laurabejarano.traveldiary.viewmodel.TravelLogViewModel
 
 /**
- * AppNavHost connects all screens
+ * AppNavHost connects all screens, navigation
  */
 @Composable
 fun AppNavHost(
@@ -29,19 +29,27 @@ fun AppNavHost(
             HomeScreen(navController = navController, viewModel = viewModel)
         }
 
-        // Details Screen
-        composable(NavRoutes.Details.route) {
-            DetailsScreen(navController = navController, viewModel = viewModel)
-        }
-
-        // Create Log Screen
-        composable(NavRoutes.Create.route) {
-            CreateLogScreen(navController = navController, viewModel = viewModel)
-        }
-
         // Search Screen
-//        composable(NavRoutes.Search.route) {
-//            SearchScreen(navController = navController, viewModel = viewModel)
-//        }
+        composable(NavRoutes.Search.route) {
+            SearchScreen(navController = navController, viewModel = viewModel)
+        }
+
+        // Create new
+        composable(NavRoutes.Create.route) {
+            CreateLogScreen(navController = navController, viewModel = viewModel, editingId = null)
+        }
+
+        // Edit existing (reuse Create screen with prefill)
+        composable(route = "${NavRoutes.Create.route}/{id}") { backStackEntry ->
+            val id = backStackEntry.arguments?.getString("id")?.toIntOrNull()
+            CreateLogScreen(navController = navController, viewModel = viewModel, editingId = id)
+        }
+
+        //  Details with ID argument
+        composable(route = "${NavRoutes.Details.route}/{id}") { backStackEntry ->
+            val id = backStackEntry.arguments?.getString("id")?.toIntOrNull()
+            DetailsScreen(navController = navController, viewModel = viewModel, id = id)
+        }
+
     }
 }
