@@ -1,5 +1,6 @@
 package com.laurabejarano.traveldiary.ui.ui.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -26,7 +27,7 @@ fun SearchScreen(
     val allLogs by viewModel.travelLogs.collectAsState()
     var query by remember { mutableStateOf(TextFieldValue("")) }
 
-    // Filter list based on search query (title/location)
+    // Filter logs based on query
     val filteredLogs = remember(query, allLogs) {
         if (query.text.isBlank()) allLogs
         else allLogs.filter {
@@ -37,64 +38,67 @@ fun SearchScreen(
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text("Search Trips") }
-            )
+            CenterAlignedTopAppBar(title = { Text("Search Trips") })
         },
         bottomBar = {
             BottomNav(navController = navController)
         }
     ) { innerPadding ->
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(innerPadding)
-            .padding(16.dp)
-    ) {
-        // Search Bar
-        OutlinedTextField(
-            value = query,
-            onValueChange = { query = it },
-            label = { Text("Search by title or location") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 12.dp)
-        )
 
-        // Results List
-        if (filteredLogs.isEmpty()) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("No matching travel logs found")
-            }
-        } else {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(filteredLogs) { log ->
-                    SearchResultItem(
-                        log = log,
-                        onClick = {
-                            // Navigate to Details screen with the selected log's ID
-                            navController.navigate("${NavRoutes.Details.route}/${log.id}")
-                        }
-                    )
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(16.dp)
+        ) {
+            // 🔍 Search Bar
+            OutlinedTextField(
+                value = query,
+                onValueChange = { query = it },
+                label = { Text("Search by title or location") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 12.dp)
+            )
+
+            // 🧭 Results List
+            if (filteredLogs.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("No matching travel logs found")
+                }
+            } else {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(filteredLogs) { log ->
+                        SearchResultItem(
+                            log = log,
+                            onClick = {
+                                navController.navigate("${NavRoutes.Details.route}/${log.id}")
+                            }
+                        )
+                    }
                 }
             }
         }
-    }
+    } // ✅ Scaffold closes here
 }
 
 
-
+// Card for displaying each search result
 @Composable
-fun SearchResultItem(log: TravelLog, onClick: () -> Unit) {
+fun SearchResultItem(
+    log: TravelLog,
+    onClick: () -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable { onClick() }
             .padding(horizontal = 4.dp),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
@@ -103,14 +107,8 @@ fun SearchResultItem(log: TravelLog, onClick: () -> Unit) {
                 .fillMaxWidth()
                 .padding(12.dp)
         ) {
-            Text(
-                text = log.title,
-                style = MaterialTheme.typography.titleMedium
-            )
-            Text(
-                text = log.location,
-                style = MaterialTheme.typography.bodyMedium
-            )
+            Text(text = log.title, style = MaterialTheme.typography.titleMedium)
+            Text(text = log.location, style = MaterialTheme.typography.bodyMedium)
         }
     }
 }
