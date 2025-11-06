@@ -3,7 +3,6 @@ package com.laurabejarano.traveldiary.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.laurabejarano.traveldiary.data.database.TravelLogDB
 import com.laurabejarano.traveldiary.data.model.TravelLog
@@ -26,7 +25,7 @@ class TravelLogViewModel(application: Application) : AndroidViewModel(applicatio
     private val _currentLog = MutableStateFlow<TravelLog?>(null)
     val currentLog: StateFlow<TravelLog?> = _currentLog.asStateFlow()
 
-    // Load a log from DB by ID (process-death safe)
+    // Load a log from DB by ID
     fun loadLogById(id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             _currentLog.value = repo.getById(id)
@@ -47,4 +46,23 @@ class TravelLogViewModel(application: Application) : AndroidViewModel(applicatio
     fun deleteLog(log: TravelLog) {
         viewModelScope.launch(Dispatchers.IO) { repo.delete(log) }
     }
+
+    fun markAsFavourite(log: TravelLog) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repo.setFavourite(log.id, true)
+            // Also update selected item if it is the same
+            if (_currentLog.value?.id == log.id) {
+                _currentLog.update { it?.copy(isFavourite = true) }
+            }
+        }
+    }
+    fun toggleFavourite(log: TravelLog, setTo: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repo.setFavourite(log.id, setTo)
+            if (_currentLog.value?.id == log.id) {
+                _currentLog.update { it?.copy(isFavourite = setTo) }
+            }
+        }
+    }
+
 }

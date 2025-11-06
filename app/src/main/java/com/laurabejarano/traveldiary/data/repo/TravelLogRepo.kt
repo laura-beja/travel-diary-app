@@ -11,4 +11,5 @@ class TravelLogRepo(private val dao: TravelLogDao) {
     suspend fun update(log: TravelLog) = dao.updateLog(log)
     suspend fun delete(log: TravelLog) = dao.deleteLog(log)
     suspend fun getById(id: Int): TravelLog? = dao.getLogById(id)
+    suspend fun setFavourite(id: Int, favourite: Boolean) = dao.setFavourite(id, favourite)
 }

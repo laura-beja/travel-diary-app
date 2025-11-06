@@ -30,4 +30,8 @@ interface TravelLogDao {
     // Search by title or location (for Search screen)
     @Query("SELECT * FROM travel_logs WHERE title LIKE '%' || :query || '%' OR location LIKE '%' || :query || '%' ORDER BY id DESC")
     fun searchLogs(query: String): Flow<List<TravelLog>>
+
+    // Add as Favorite
+    @Query("UPDATE travel_logs SET isFavourite = :favourite WHERE id = :id")
+    suspend fun setFavourite(id: Int, favourite: Boolean)
 }

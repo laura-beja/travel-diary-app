@@ -20,18 +20,19 @@ fun AppNavHost(
     viewModel: TravelLogViewModel,
     padding: PaddingValues = PaddingValues()
 ) {
+    val travelLogViewModel: TravelLogViewModel = viewModel
     NavHost(
         navController = navController,
         startDestination = NavRoutes.Home.route
     ) {
         // Home Screen
         composable(NavRoutes.Home.route) {
-            HomeScreen(navController = navController, viewModel = viewModel)
+            HomeScreen(navController = navController, viewModel = travelLogViewModel)
         }
 
         // Search Screen
         composable(NavRoutes.Search.route) {
-            SearchScreen(navController = navController, viewModel = viewModel)
+            SearchScreen(navController = navController, viewModel = travelLogViewModel)
         }
 
         // Create new

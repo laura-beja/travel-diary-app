@@ -12,5 +12,6 @@ data class TravelLog(
     val startDate: String,
     val endDate: String,
     val participants: String, // stored as a ',' separated list
-    val description: String
+    val description: String,
+    val isFavourite: Boolean = false
 )
